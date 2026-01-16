@@ -16,6 +16,20 @@
 
     <div class="container mt-5">
         <h1 class="text-center mb-4">Nuestros Productos</h1>
+        <div class="d-flex justify-content-center mb-5 gap-2">
+            <a href="/" class="btn <%= !categoriaActiva ? 'btn-dark' : 'btn-outline-dark' %>">
+                Ver Todos
+            </a>
+
+            <% categorias.forEach(cat => { %>
+                <a href="/?categoria=<%= cat %>" 
+                   class="btn <%= categoriaActiva === cat ? 'btn-dark' : 'btn-outline-dark' %>">
+                   <%= cat %>
+                </a>
+            <% }) %>
+        </div>
+        <div class="row">
+            
 
         <div class="row">
             <% productos.forEach(item => { %>
