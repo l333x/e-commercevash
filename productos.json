@@ -1,0 +1,26 @@
+[
+  {
+    "nombre": "Monitor LG 24\"",
+    "precio": 150,
+    "categoria": "Monitores",
+    "imagen": "https://dummyimage.com/200x200/000/fff&Text=MonitorLg"
+  },
+  {
+    "nombre": "Monitor Samsung 27\"",
+    "precio": 200,
+    "categoria": "Monitores",
+    "imagen": "https://dummyimage.com/200x200/000/fff&Text=MonitorSamsung"
+  },
+  {
+    "nombre": "Laptop Dell Inspiron",
+    "precio": 800,
+    "categoria": "Laptops",
+    "imagen": "https://dummyimage.com/200x200/000/fff&Text=LaptopDell"
+  },
+  {
+    "nombre": "Laptop HP Pavilion",
+    "precio": 750,
+    "categoria": "Laptops",
+    "imagen": "https://dummyimage.com/200x200/000/fff&Text=LaptopHP"
+  }
+]
