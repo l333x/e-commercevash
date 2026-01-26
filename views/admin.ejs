@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - TechStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action {
+            padding: 0.4rem 0.8rem;
+            margin: 0 0.2rem;
+        }
+
+        .product-img-thumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        /* Modal de Confirmación */
+        .modal-danger .modal-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border-bottom: none;
+        }
+
+        .modal-danger .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-danger .btn-confirm-delete {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .modal-danger .btn-confirm-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        .modal-danger .warning-icon {
+            font-size: 4rem;
+            color: #dc3545;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-dark bg-dark shadow">
+        <div class="container">
+            <a class="navbar-brand" href="/">🚀 TechStore</a>
+            <a href="/" class="btn btn-sm btn-outline-light">← Volver a la Tienda</a>
+        </div>
+    </nav>
+
+    <!-- Modal de Confirmación de Eliminación -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-danger">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-trash-fill warning-icon"></i>
+                    <h4 class="mt-3 mb-3">¿Estás seguro?</h4>
+                    <p class="text-muted">Vas a eliminar el producto:</p>
+                    <h5 class="text-danger fw-bold" id="productNameToDelete"></h5>
+                    <p class="mt-3 text-muted"><strong>Esta acción no se puede deshacer</strong></p>
+                </div>
+                <div class="modal-footer justify-content-center border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger btn-confirm-delete" id="confirmDeleteBtn">
+                        <i class="bi bi-trash-fill"></i> Sí, Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1 class="mb-0">
+                    <i class="bi bi-gear-fill"></i> Panel de Administración
+                </h1>
+                <p class="mb-0 mt-2">Gestiona los productos de tu tienda</p>
+            </div>
+
+            <% if (mensaje) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= mensaje %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <% } %>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>Productos (<%= productos.length %>)</h3>
+                        <a href="/admin/producto/nuevo" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle"></i> Agregar Producto
+                        </a>
+                    </div>
+
+                    <% if (productos.length===0) { %>
+                        <div class="empty-state">
+                            <i class="bi bi-box-seam" style="font-size: 4rem;"></i>
+                            <h3 class="mt-3">No hay productos</h3>
+                            <p>Comienza agregando tu primer producto a la tienda</p>
+                            <a href="/admin/producto/nuevo" class="btn btn-primary mt-3">
+                                <i class="bi bi-plus-circle"></i> Agregar Primer Producto
+                            </a>
+                        </div>
+                        <% } else { %>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Imagen</th>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                            <th>Categoría</th>
+                                            <th>Descripción</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% productos.forEach(producto=> { %>
+                                            <tr>
+                                                <td>
+                                                    <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>"
+                                                        class="product-img-thumb">
+                                                </td>
+                                                <td><strong>
+                                                        <%= producto.nombre %>
+                                                    </strong></td>
+                                                <td class="text-success fw-bold">$<%= producto.precio.toFixed(2) %>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        <%= producto.categoria %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">
+                                                        <%= producto.descripcion ? (producto.descripcion.substring(0,
+                                                            50) + '...' ) : 'Sin descripción' %>
+                                                    </small>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href="/producto/<%= producto._id %>"
+                                                        class="btn btn-sm btn-info btn-action" target="_blank"
+                                                        title="Ver">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a href="/admin/producto/<%= producto._id %>/editar"
+                                                        class="btn btn-sm btn-warning btn-action" title="Editar">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-danger btn-action delete-btn"
+                                                        title="Eliminar" data-product-id="<%= producto._id %>"
+                                                        data-product-name="<%= producto.nombre %>">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <% } %>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Manejo del modal de eliminación
+        let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        let productToDelete = null;
+
+        // Agregar event listeners a todos los botones de eliminar
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                const productName = this.getAttribute('data-product-name');
+
+                // Guardar información del producto a eliminar
+                productToDelete = {
+                    id: productId,
+                    name: productName
+                };
+
+                // Actualizar el nombre del producto en el modal
+                document.getElementById('productNameToDelete').textContent = productName;
+
+                // Mostrar el modal
+                deleteModal.show();
+            });
+        });
+
+        // Confirmar eliminación
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            if (productToDelete) {
+                // Crear y enviar formulario de eliminación
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/producto/${productToDelete.id}/eliminar`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    </script>
+</body>
+
+</html>

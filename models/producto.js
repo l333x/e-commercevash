@@ -18,8 +18,12 @@ const productoSchema = new mongoose.Schema({
     imagen: {
         type: String,
         default: "https://dummyimage.com/200x200/000/fff"
+    },
+    descripcion: {
+        type: String,
+        trim: true,
+        default: "Producto de alta calidad disponible en nuestra tienda."
     }
-    
 });
 
 module.exports = mongoose.model('Producto', productoSchema, 'producto');
